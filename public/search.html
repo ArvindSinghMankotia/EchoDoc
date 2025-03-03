@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Users - EchoDocs</title>
+    <link rel="stylesheet" href="./css/search.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Admin Dashboard</h2>
+        <a href="/admin.html">Home</a>
+        <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="content">
+        <h1>Search & Manage Users</h1>
+        <div class="card">
+            <h2>Search by Email</h2>
+            <form id="searchUserForm">
+                <label for="searchEmail">Email:</label>
+                <input type="email" id="searchEmail" placeholder="Enter user email" required>
+                <button type="submit">Search</button>
+            </form>
+            <div id="userDetails"></div>
+        </div>
+        <div id="response"></div>
+    </div>
+    <script src="./js/search.js"></script>
+</body>
+</html>

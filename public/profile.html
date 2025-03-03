@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - EchoDocs</title>
+    <link rel="stylesheet" href="./css/profile.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>User Dashboard</h2>
+        <a href="/user.html">Home</a>
+        <a href="/upload.html">Upload & Scan</a>
+        <a href="/analytics.html">Analytics</a>
+        <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="content">
+        <h1>Your Profile</h1>
+        <div class="card">
+            <h2>Profile Details</h2>
+            <table id="profileTable">
+                <tbody id="profileInfo"></tbody>
+            </table>
+        </div>
+        <div id="response"></div>
+    </div>
+    <script src="./js/profile.js"></script>
+</body>
+</html>

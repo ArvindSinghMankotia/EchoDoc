@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Scan - EchoDocs</title>
+    <link rel="stylesheet" href="./css/upload.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>User Dashboard</h2>
+        <a href="/user.html">Home</a>
+        <a href="/profile.html">Profile</a>
+        <a href="#" id="logout">Logout</a>
+    </div>
+    <div class="content">
+        <h1>Upload & Scan</h1>
+        <div class="card">
+            <h2>Upload a .txt File</h2>
+            <form id="uploadForm">
+                <label for="document">Select File:</label>
+                <input type="file" id="document" name="document" accept=".txt" required>
+                <button type="submit">Upload</button>
+            </form>
+            <div id="loading" style="display: none;">Scanning... Please wait.</div>
+        </div>
+        <div id="matches" class="card" style="display: none;">
+            <h2>Matching Documents</h2>
+            <table id="matchesTable">
+                <thead>
+                    <tr>
+                        <th>Document ID</th>
+                        <th>Filename</th>
+                        <th>Similarity (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="matchesList"></tbody>
+            </table>
+        </div>
+        <div id="response"></div>
+    </div>
+    <script src="./js/upload.js"></script>
+</body>
+</html>
