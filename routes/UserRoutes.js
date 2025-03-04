@@ -14,7 +14,7 @@ router.get("/profile", authenticateToken, UserController.profile);
 router.get("/matchingdocs", authenticateToken, UserController.matchingdocs);
 router.post("/admin/adjust-credits", authenticateToken, authorizeAdmin, UserController.adjustCredits);
 router.get("/matches/:docId", authenticateToken, UserController.getMatches);
-router.get("/scan-history", authenticateToken, UserController.getScanHistory); // New route
-
+router.get("/scan-history", authenticateToken, UserController.getScanHistory);
+router.get("/download/:filename", authenticateToken, UserController.downloadFile);
 
 module.exports = router;

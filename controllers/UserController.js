@@ -156,6 +156,7 @@ class UserController {
             return res.status(500).json({ message: "Internal server error" });
         }
     }
+
     static async uploadscan(req, res) {
         upload(req, res, async (err) => {
             if (err) return res.status(400).json({ message: err.message });
@@ -200,11 +201,17 @@ class UserController {
             throw new Error("Failed to read uploaded file");
         }
 
-        // Fetch only recent documents to reduce comparisons
-        const docStmt = db.prepare("SELECT id, filename FROM documents WHERE id != ? ORDER BY uploaded_at DESC LIMIT 10");
+        const docStmt = db.prepare(`
+            SELECT d.id, d.filename, u.name AS uploaded_by 
+            FROM documents d 
+            JOIN users u ON d.userid = u.userid 
+            WHERE d.id != ? 
+            ORDER BY d.uploaded_at DESC 
+            LIMIT 10
+        `);
         const allDocs = docStmt.all(docId);
 
-        if (allDocs.length === 0) return []; // No documents to compare, return empty matches
+        if (allDocs.length === 0) return [];
 
         const matches = [];
         for (const doc of allDocs) {
@@ -213,27 +220,25 @@ class UserController {
             try {
                 oldFileContent = await fs.readFile(oldFilePath, "utf-8");
             } catch (error) {
-                continue; // Skip if file is missing
+                continue;
             }
 
-            const chunkSize = 2000; // Smaller chunks to reduce API calls and token size
+            const chunkSize = 2000;
             const newChunks = chunkText(newFileContent, chunkSize);
             const oldChunks = chunkText(oldFileContent, chunkSize);
             let totalSimilarity = 0;
             let chunkCount = Math.min(newChunks.length, oldChunks.length);
 
-            if (chunkCount === 0) continue; // Skip if no chunks to compare
+            if (chunkCount === 0) continue;
 
-            // Compare only the first few chunks to save time
-            const maxChunks = Math.min(chunkCount, 2); // Limit to 2 chunks per comparison
+            const maxChunks = Math.min(chunkCount, 2);
             for (let i = 0; i < maxChunks; i++) {
                 const prompt = `
                     Compare these two text chunks and return a similarity score (0-100) as a JSON object:
-                    Chunk 1: ${newChunks[i].substring(0, 500)}  // Limit to 500 chars per chunk
+                    Chunk 1: ${newChunks[i].substring(0, 500)}
                     Chunk 2: ${oldChunks[i].substring(0, 500)}
                     Format: {"similarity": <number>}
                 `;
-
                 try {
                     const result = await retryRequest(() => model.generateContent(prompt), 3, 1000);
                     const responseText = result.response.text();
@@ -241,21 +246,36 @@ class UserController {
                     const similarityObj = JSON.parse(cleanedText);
                     totalSimilarity += similarityObj.similarity || 0;
                 } catch (error) {
-                    if (error.status === 429) continue; // Skip on rate limit
-                    continue; // Skip other errors
+                    if (error.status === 429) continue;
+                    continue;
                 }
             }
 
             const similarity = maxChunks > 0 ? Math.round(totalSimilarity / maxChunks) : 0;
-            if (similarity > 70) { // Higher threshold for relevance
-                matches.push({ docId: doc.id, filename: doc.filename, similarity });
+            if (similarity > 70) {
+                matches.push({ docId: doc.id, filename: doc.filename, uploaded_by: doc.uploaded_by, similarity });
             }
         }
 
+        matches.sort((a, b) => b.similarity - a.similarity);
         const historyStmt = db.prepare("INSERT INTO scan_history (doc_id, user_id, matches) VALUES (?, ?, ?)");
         historyStmt.run(docId, userId, JSON.stringify(matches));
 
         return matches;
+    }
+
+    static async downloadFile(req, res) {
+        try {
+            const { filename } = req.params;
+            const filePath = path.join(__dirname, "../uploads", filename);
+            await fs.access(filePath);
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Content-Type", "text/plain");
+            res.sendFile(filePath);
+        } catch (error) {
+            console.error("Download error:", error);
+            res.status(404).json({ message: "File not found or inaccessible" });
+        }
     }
 
     static async getMatches(req, res) {
@@ -337,7 +357,7 @@ async function retryRequest(fn, maxRetries = 3, delay = 1000) {
         } catch (error) {
             if (error.status === 429 && i < maxRetries - 1) {
                 await new Promise(resolve => setTimeout(resolve, delay));
-                delay *= 2; // Exponential backoff
+                delay *= 2;
             } else {
                 throw error;
             }
@@ -345,6 +365,7 @@ async function retryRequest(fn, maxRetries = 3, delay = 1000) {
     }
     throw new Error("Max retries reached for rate limit");
 }
+
 function chunkText(text, size) {
     const chunks = [];
     for (let i = 0; i < text.length; i += size) {

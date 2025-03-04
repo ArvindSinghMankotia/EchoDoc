@@ -21,7 +21,6 @@ document.getElementById("logout").addEventListener("click", (e) => {
     window.location.href = "/login.html";
 });
 
-// Helper function to show styled messages
 function showMessage(message, isSuccess = true) {
     const responseDiv = document.getElementById("response");
     responseDiv.innerHTML = `<div class="${isSuccess ? 'success-message' : 'error-message'}">${message}</div>`;
@@ -64,13 +63,17 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
                     tr.innerHTML = `
                         <td>${match.docId}</td>
                         <td>${match.filename}</td>
+                        <td>${match.uploaded_by}</td>
                         <td>${match.similarity}%</td>
+                        <td>
+                            <button onclick="downloadFile('${match.filename}')">Download</button>
+                        </td>
                     `;
                     matchesList.appendChild(tr);
                 });
-                showMessage(`Scan completed! Found ${result.matches.length} matching document${result.matches.length === 1 ? '' : 's'}.`, true);
+                showMessage(`Scan completed! Found ${result.matches.length} matching document${result.matches.length === 1 ? '' : 's'}. All matches available for download.`, true);
             } else {
-                matchesList.innerHTML = "<tr><td colspan='3'>No similar documents found.</td></tr>";
+                matchesList.innerHTML = "<tr><td colspan='5'>No similar documents found.</td></tr>";
                 showMessage("Scan completed! No similar documents found.", true);
             }
         } else {
@@ -81,3 +84,12 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         showMessage(`Upload failed: ${error.message}`, false);
     }
 });
+
+function downloadFile(filename) {
+    const url = `http://localhost:3000/api/users/download/${filename}`;
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    link.setAttribute("target", "_blank");
+    link.click();
+}
