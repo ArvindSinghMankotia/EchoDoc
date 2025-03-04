@@ -32,7 +32,6 @@ document.getElementById("pendingRequestsLink").addEventListener("click", (e) => 
     document.getElementById("searchUsersSection").classList.remove("active");
 });
 
-
 document.getElementById("searchUsersLink").insertAdjacentHTML("afterend", `
     <a href="/analytics.html" id="analyticsLink">Analytics</a>
 `);
@@ -50,6 +49,13 @@ document.getElementById("logout").addEventListener("click", (e) => {
 });
 
 document.getElementById("refreshRequestsBtn").addEventListener("click", loadPendingRequests);
+
+// Helper function to show styled messages
+function showMessage(message, isSuccess = true) {
+    const responseDiv = document.getElementById("response");
+    responseDiv.innerHTML = `<div class="${isSuccess ? 'success-message' : 'error-message'}">${message}</div>`;
+    setTimeout(() => responseDiv.innerHTML = '', 5000);
+}
 
 async function loadPendingRequests() {
     try {
@@ -73,6 +79,7 @@ async function loadPendingRequests() {
         if (requestCount === 0) {
             console.log("No pending requests to display");
             list.innerHTML = "<tr><td colspan='5'>No pending requests available.</td></tr>";
+            showMessage("No pending requests found", true);
         } else {
             console.log("Rendering requests...");
             result.pendingRequests.forEach((req, index) => {
@@ -90,11 +97,12 @@ async function loadPendingRequests() {
                 `;
                 list.appendChild(tr);
             });
+            showMessage("Pending requests loaded successfully", true);
         }
     } catch (error) {
         console.error("Error in loadPendingRequests:", error);
-        document.getElementById("pendingRequestsList").innerHTML = "<tr><td colspan='5'>Error: " + error.message + "</td></tr>";
-        document.getElementById("response").textContent = `Error: ${error.message}`;
+        document.getElementById("pendingRequestsList").innerHTML = "<tr><td colspan='5'>Error loading requests</td></tr>";
+        showMessage(`Error loading requests: ${error.message}`, false);
     }
 }
 
@@ -111,13 +119,16 @@ async function approveRequest(requestId, credits) {
         });
         const result = await response.json();
         console.log("Approve response:", result);
-        document.getElementById("response").textContent = JSON.stringify(result, null, 2);
+        
         if (response.ok) {
+            showMessage(`Request #${requestId} approved successfully! Added ${credits} credits.`);
             loadPendingRequests();
+        } else {
+            showMessage(result.message || "Failed to approve request", false);
         }
     } catch (error) {
         console.error("Error approving request:", error);
-        document.getElementById("response").textContent = `Error: ${error.message}`;
+        showMessage(`Error approving request: ${error.message}`, false);
     }
 }
 
@@ -134,13 +145,16 @@ async function rejectRequest(requestId) {
         });
         const result = await response.json();
         console.log("Reject response:", result);
-        document.getElementById("response").textContent = JSON.stringify(result, null, 2);
+        
         if (response.ok) {
+            showMessage(`Request #${requestId} rejected successfully!`);
             loadPendingRequests();
+        } else {
+            showMessage(result.message || "Failed to reject request", false);
         }
     } catch (error) {
         console.error("Error rejecting request:", error);
-        document.getElementById("response").textContent = `Error: ${error.message}`;
+        showMessage(`Error rejecting request: ${error.message}`, false);
     }
 }
 
@@ -156,6 +170,7 @@ document.getElementById("searchUserForm").addEventListener("submit", async (e) =
         const result = await response.json();
         console.log("Search response:", result);
         const details = document.getElementById("userDetails");
+        
         if (response.ok) {
             details.innerHTML = `
                 <p>Name: ${result.name}</p>
@@ -167,6 +182,8 @@ document.getElementById("searchUserForm").addEventListener("submit", async (e) =
                     <button type="submit">Update</button>
                 </form>
             `;
+            showMessage("User found successfully", true);
+            
             document.getElementById("updateCreditsForm").addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const newCredits = parseInt(document.getElementById("newCredits").value);
@@ -182,17 +199,25 @@ document.getElementById("searchUserForm").addEventListener("submit", async (e) =
                     });
                     const updateResult = await updateResponse.json();
                     console.log("Update credits response:", updateResult);
-                    document.getElementById("response").textContent = JSON.stringify(updateResult, null, 2);
+                    
+                    if (updateResponse.ok) {
+                        showMessage(`Credits updated successfully to ${newCredits}!`);
+                        // Refresh user details
+                        document.getElementById("searchUserForm").dispatchEvent(new Event("submit"));
+                    } else {
+                        showMessage(updateResult.message || "Failed to update credits", false);
+                    }
                 } catch (error) {
                     console.error("Error updating credits:", error);
-                    document.getElementById("response").textContent = `Error: ${error.message}`;
+                    showMessage(`Error updating credits: ${error.message}`, false);
                 }
             });
         } else {
             details.innerHTML = `<p>${result.message || "User not found"}</p>`;
+            showMessage("User not found", false);
         }
     } catch (error) {
         console.error("Error searching user:", error);
-        document.getElementById("response").textContent = `Error: ${error.message}`;
+        showMessage(`Error searching user: ${error.message}`, false);
     }
 });

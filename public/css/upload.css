@@ -4,7 +4,7 @@ body {
     font-family: 'Arial', sans-serif;
     background: #f0f4f8;
     display: flex;
-    min-height: 100vh;
+    min-height: 100vh; 
 }
 
 .sidebar {
@@ -98,12 +98,12 @@ button {
     transition: background 0.3s, transform 0.3s;
 }
 
-
 #loading {
     margin-top: 10px;
     color: #34495e;
     font-weight: bold;
 }
+
 button:hover {
     background: #2980b9;
     transform: scale(1.05);
@@ -134,4 +134,27 @@ button:hover {
     background: #fff;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     white-space: pre-wrap;
+}
+
+/* Added message styles */
+.success-message {
+    background-color: #d1f2eb; /* Light turquoise to match #1abc9c theme */
+    color: #0b5345; /* Darker teal text */
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px solid #a3e4d7;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s;
+}
+
+.error-message {
+    background-color: #faded7; /* Light red */
+    color: #78281f; /* Darker red text */
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px solid #f5b7b1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s;
 }

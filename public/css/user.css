@@ -141,3 +141,26 @@ button:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     white-space: pre-wrap;
 }
+
+/* Added message styles */
+.success-message {
+    background-color: #d1f2eb; /* Light turquoise to match #1abc9c theme */
+    color: #0b5345; /* Darker teal text */
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px solid #a3e4d7;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s;
+}
+
+.error-message {
+    background-color: #faded7; /* Light red */
+    color: #78281f; /* Darker red text */
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px solid #f5b7b1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s;
+}

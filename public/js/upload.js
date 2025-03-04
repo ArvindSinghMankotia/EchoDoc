@@ -21,10 +21,20 @@ document.getElementById("logout").addEventListener("click", (e) => {
     window.location.href = "/login.html";
 });
 
+// Helper function to show styled messages
+function showMessage(message, isSuccess = true) {
+    const responseDiv = document.getElementById("response");
+    responseDiv.innerHTML = `<div class="${isSuccess ? 'success-message' : 'error-message'}">${message}</div>`;
+    setTimeout(() => responseDiv.innerHTML = '', 5000);
+}
+
 document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const file = document.getElementById("document").files[0];
-    if (!file) return;
+    if (!file) {
+        showMessage("Please select a file to upload", false);
+        return;
+    }
 
     const formData = new FormData();
     formData.append("document", file);
@@ -40,9 +50,9 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
             body: formData
         });
         const result = await response.json();
-        document.getElementById("response").textContent = JSON.stringify(result, null, 2);
 
         loading.style.display = "none";
+        
         if (response.ok) {
             const matchesList = document.getElementById("matchesList");
             matchesList.innerHTML = "";
@@ -58,12 +68,16 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
                     `;
                     matchesList.appendChild(tr);
                 });
+                showMessage(`Scan completed! Found ${result.matches.length} matching document${result.matches.length === 1 ? '' : 's'}.`, true);
             } else {
                 matchesList.innerHTML = "<tr><td colspan='3'>No similar documents found.</td></tr>";
+                showMessage("Scan completed! No similar documents found.", true);
             }
+        } else {
+            showMessage(result.message || "Failed to process upload", false);
         }
     } catch (error) {
         loading.style.display = "none";
-        document.getElementById("response").textContent = `Error: ${error.message}`;
+        showMessage(`Upload failed: ${error.message}`, false);
     }
 });
