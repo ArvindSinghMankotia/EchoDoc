@@ -22,17 +22,5 @@ db.exec(`
     )
 `);
 
-// Add scan_count column if it doesn't exist
-try {
-    db.exec("ALTER TABLE scan_history ADD COLUMN scan_count INTEGER DEFAULT 0");
-    console.log("✅ Added scan_count column to scan_history");
-} catch (error) {
-    if (error.code !== 'SQLITE_ERROR' || !error.message.includes('duplicate column name')) {
-        console.error("Error adding scan_count column:", error);
-    } else {
-        console.log("✅ scan_count column already exists in scan_history");
-    }
-}
-
 console.log("✅ Documents and scan_history tables are ready!");
 module.exports = db;

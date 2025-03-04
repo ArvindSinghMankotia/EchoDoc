@@ -9,7 +9,7 @@ const path = require("path");
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 class UserController {
     static async register(req, res) {
         try {
@@ -90,46 +90,6 @@ class UserController {
             console.error("Error in approving credits:", error);
             return res.status(500).json({ message: "Internal server error" });
         }
-    }
-
-    static async uploadscan(req, res) {
-        upload(req, res, async (err) => {
-            if (err) {
-                console.error("Upload error:", err.message);
-                return res.status(400).json({ message: err.message });
-            }
-
-            if (!req.file) {
-                return res.status(400).json({ message: "No file uploaded" });
-            }
-
-            try {
-                const user_id = req.user.userid;
-                const userStmt = db.prepare("SELECT credits FROM users WHERE userid = ?");
-                const user = userStmt.get(user_id);
-
-                if (user.credits <= 0) {
-                    return res.status(403).json({ message: "Insufficient credits" });
-                }
-
-                const filename = req.file.filename;
-                const stmt = db.prepare("INSERT INTO documents (userid, filename) VALUES (?, ?)");
-                stmt.run(user_id, filename);
-
-                const filesStmt = db.prepare("SELECT files_uploaded FROM users WHERE userid = ?");
-                const filesData = filesStmt.get(user_id);
-                let uploadedFiles = filesData.files_uploaded ? JSON.parse(filesData.files_uploaded) : [];
-                uploadedFiles.push(filename);
-
-                const updateStmt = db.prepare("UPDATE users SET files_uploaded = ?, credits = credits - 1 WHERE userid = ?");
-                updateStmt.run(JSON.stringify(uploadedFiles), user_id);
-
-                return res.status(200).json({ message: "Text file uploaded successfully", filename });
-            } catch (error) {
-                console.error("Upload error:", error);
-                return res.status(500).json({ message: "Internal server error" });
-            }
-        });
     }
 
     static async profile(req, res) {
