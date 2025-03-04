@@ -348,6 +348,44 @@ class UserController {
             res.status(500).json({ message: "Internal server error" });
         }
     }
+    static async exportScanHistory(req, res) {
+        try {
+            const userId = req.user.userid;
+            const stmt = db.prepare(`
+                SELECT scan_id, doc_id, scanned_at, matches
+                FROM scan_history
+                WHERE user_id = ?
+                ORDER BY scanned_at DESC
+            `);
+            const history = stmt.all(userId);
+
+            if (!history || history.length === 0) {
+                return res.status(404).json({ message: "No scan history found" });
+            }
+
+            // Generate text content
+            let reportContent = "EchoDocs Scan History\n";
+            reportContent += "====================\n\n";
+            history.forEach((entry, index) => {
+                const matches = JSON.parse(entry.matches || "[]");
+                reportContent += `Scan #${index + 1}\n`;
+                reportContent += `Scan ID: ${entry.scan_id}\n`;
+                reportContent += `Document ID: ${entry.doc_id}\n`;
+                reportContent += `Scanned At: ${entry.scanned_at}\n`;
+                reportContent += `Matches: ${matches.length > 0 ? matches.map(m => `${m.filename} (${m.similarity}%)`).join(", ") : "None"}\n`;
+                reportContent += "--------------------\n\n";
+            });
+
+            // Serve as a downloadable text file
+            const filename = `scan_history_${userId}_${Date.now()}.txt`;
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Content-Type", "text/plain");
+            res.send(reportContent);
+        } catch (error) {
+            console.error("Export history error:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 
 }
 async function retryRequest(fn, maxRetries = 3, delay = 1000) {

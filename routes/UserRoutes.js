@@ -16,5 +16,6 @@ router.post("/admin/adjust-credits", authenticateToken, authorizeAdmin, UserCont
 router.get("/matches/:docId", authenticateToken, UserController.getMatches);
 router.get("/scan-history", authenticateToken, UserController.getScanHistory);
 router.get("/download/:filename", authenticateToken, UserController.downloadFile);
+router.get("/export-history", authenticateToken, UserController.exportScanHistory); // New endpoint
 
 module.exports = router;

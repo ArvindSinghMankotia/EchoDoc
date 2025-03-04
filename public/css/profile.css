@@ -85,6 +85,24 @@ h1 {
     width: 30%;
 }
 
+.card button {
+    background: #3498db;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    margin-top: 20px;
+}
+
+.card button:hover {
+    background: #2980b9;
+    transform: scale(1.05);
+}
+
 #response {
     margin-top: 20px;
     padding: 15px;
@@ -92,4 +110,24 @@ h1 {
     background: #fff;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     white-space: pre-wrap;
+}
+
+.success-message {
+    background-color: #d1f2eb;
+    color: #0b5345;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 0;
+    border: 1px solid #a3e4d7;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    background-color: #faded7;
+    color: #78281f;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 0;
+    border: 1px solid #f5b7b1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
