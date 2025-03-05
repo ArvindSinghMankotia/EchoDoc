@@ -1,6 +1,6 @@
-const Database = require("better-sqlite3");
+const database = require("better-sqlite3");
 
-const db = new Database("database.sqlite", {
+const db = new database("database.sqlite", {
     verbose: console.log,  // Logs queries for debugging
 });
 
