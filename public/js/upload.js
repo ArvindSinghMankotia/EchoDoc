@@ -16,7 +16,7 @@ fetch("http://localhost:3000/api/users/profile", {
 });
 
 document.getElementById("logout").addEventListener("click", (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     localStorage.removeItem("token");
     window.location.href = "/login.html";
 });
@@ -66,7 +66,7 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
                         <td>${match.uploaded_by}</td>
                         <td>${match.similarity}%</td>
                         <td>
-                            <button onclick="downloadFile('${match.filename}')">Download</button>
+                            <button onclick="downloadFile('${match.filename.replace(/'/g, "\\'").replace(/"/g, '\\"')}')">Download</button>
                         </td>
                     `;
                     matchesList.appendChild(tr);
@@ -86,10 +86,28 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
 });
 
 function downloadFile(filename) {
-    const url = `http://localhost:3000/api/users/download/${filename}`;
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", filename);
-    link.setAttribute("target", "_blank");
-    link.click();
+    console.log(`Attempting to download: ${filename}`); // Debug log
+    const url = `http://localhost:3000/api/users/download/${encodeURIComponent(filename)}`;
+    console.log(`Download URL: ${url}`); // Debug log
+    fetch(url, {
+        headers: { "Authorization": `Bearer ${token}` }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Download failed");
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        console.log(`Download triggered for: ${url}`);
+        showMessage("File downloaded successfully", true);
+    })
+    .catch(error => {
+        console.error(`Download error: ${error.message}`);
+        showMessage(`Failed to download file: ${error.message}`, false);
+    });
 }
