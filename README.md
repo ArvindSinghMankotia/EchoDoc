@@ -1,22 +1,24 @@
 # EchoDocs
 
-EchoDocs is a web application that allows users to upload text files, scan them for similarity against existing documents, manage credits, and download matching files. It includes an admin dashboard for managing user credit requests and adjusting credits, and a user dashboard for uploading files and requesting credits. The application uses SQLite for data storage, Express.js for the backend, and vanilla JavaScript with HTML/CSS for the frontend.
+EchoDocs is a web application that allows users to upload text files, scan them for similarity against existing documents, manage credits, and download matching files. It includes an admin dashboard for managing user credit requests, searching users by email, and adjusting credits, as well as a user dashboard for uploading files, requesting credits, and exporting scan history. The application uses SQLite for data storage, Express.js for the backend, and vanilla JavaScript with HTML/CSS for the frontend.
 
 ## Features
 
 ### User Features
-- **Register and Login:** Users can create accounts and log in securely.
-- **File Upload and Scan:** Upload `.txt` files and scan for similar documents (similarity > 70%) using Google’s Gemini API.
-- **Download Matches:** Download all matching files identified during a scan.
-- **Credit System:** Users start with 20 credits, lose 1 per upload/scan, and can request more from admins.
-- **Dashboard:** View current credits and total scans performed.
+- **Register and Login:** Users can create accounts and log in securely via the `/login.html` page.
+- **File Upload and Scan:** Upload `.txt` files on the `/upload.html` page and scan for similar documents (similarity > 70%) using Google’s Gemini API.
+- **Download Matches:** Download all matching files identified during a scan directly from the upload page.
+- **Credit System:** Users start with 20 credits, lose 1 per upload/scan, and can request more from admins via the `/user.html` dashboard.
+- **Dashboard:** View current credits, total scans, and request additional credits on the `/user.html` page.
+- **Profile:** View profile details (name, email, credits, role, files uploaded, total scans) and export scan history on the `/profile.html` page.
 
 ### Admin Features
-- **Manage Credit Requests:** Approve or reject user credit requests with custom credit amounts.
-- **User Management:** Search users by email and adjust their credits manually.
-- **Pre-seeded Admin:** An admin account (`admin@example.com / admin12345`) is created on setup .
+- **Manage Credit Requests:** Approve or reject user credit requests with custom amounts on the `/admin.html` dashboard under the "Pending Requests" section.
+- **User Management:** Search users by email and adjust their credits manually on the `/search.html` page.
+- **Analytics:** View scan history and user scan analytics (e.g., total scans, average similarity) on the `/analytics.html` page.
+- **Pre-seeded Admin:** An admin account (`admin@example.com / admin12345`) is created on setup.
 
-### Or Use this  key  while regestring new Admin.
+### Or Use this key while registering a new Admin:
    ```bash
    supersecretadmin
    ```
@@ -25,6 +27,50 @@ EchoDocs is a web application that allows users to upload text files, scan them 
 - **Daily Credit Reset:** Credits reset to 20 for users with less than 20 every midnight.
 - **Authentication:** JWT-based authentication for secure access.
 - **Responsive UI:** Clean, modern interface with styled success/error messages.
+
+## Screenshots
+
+### Main Page
+![Main Page](./images/main_page.png)  
+*Welcome to EchoDocs with features like 20 Free Scans Daily, Smart Matching, and Credit Flexibility.*
+
+### Sign-In Page
+![Sign-In Page](./images/sign_in.png)  
+*Users can log in with their email and password, with an option to sign up.*
+
+### Sign-Up Page
+![Sign-Up Page](./images/sign_up.png)  
+*New users can register with name, email, password, user role, and admin secret (if applicable).*
+
+### User Dashboard
+![User Dashboard](./images/user_dash.png)  
+*View credits, total scans, and request more credits.*
+
+### User Profile
+![User Profile](./images/user_profile.png)  
+*Display profile details and export scan history.*
+
+### Upload & Scan Page
+![Upload & Scan Page](./images/upload_file.png)  
+*Upload a `.txt` file and download matching documents (e.g., 95% similarity).*
+
+### Admin Dashboard
+![Admin Dashboard](./images/admin.png)  
+*Manage pending credit requests (currently 0 pending).*
+
+### Admin Search Users
+![Admin Search Users](./images/admin_search.png)  
+*Search and manage users by email.*
+
+### Admin Analytics
+![Admin Analytics](./images/admin_analy.png)  
+*View all scan history and user scan analytics.*
+
+### Admin Profile
+![Admin Profile](./images/admin_profile.png)  
+*Admin profile details with a success message.*
+
+---
 
 ## Prerequisites
 
@@ -56,16 +102,15 @@ EchoDocs is a web application that allows users to upload text files, scan them 
    ```
    - Replace `your_jwt_secret_here` with a secure secret key.
    - Replace `your_google_gemini_api_key_here` with your Google Generative AI API key.
+   
+   ```plaintext
+   Note: I have intentionally shared my .env file, which contains the API key, to allow testers to run the code effortlessly. This is a deliberate decision to facilitate testing, and I am aware of the security implications. I am not irresponsible; this is for development and testing purposes only. In a production environment, please ensure to secure your .env file and never expose sensitive information like API keys.
 
 4. **Initialize the Database:**
    The database (`database.sqlite`) is created automatically when you start the server, setting up tables for users, credit requests, documents, and scan history.
 
-5. **Seed the Admin User:**
-   Run the admin seeding script:
-   ```bash
-   node ./config/seedAdmin.js
-   ```
-   This creates an admin user with email `admin@example.com` and password `admin12345`.
+5. **The Admin User:**
+   An admin user with email `admin@example.com` and password `admin12345` is already present.
 
 6. **Start the Server:**
    ```bash
@@ -76,17 +121,20 @@ EchoDocs is a web application that allows users to upload text files, scan them 
 ## Usage
 
 1. **Access the Application:**
-   - Open `http://localhost:3000` in your browser.
+   - Open `http://localhost:3000` in your browser to view the homepage (`/index.html`).
    - Static files (HTML, CSS, JS) are served from the `public` directory.
 
 2. **User Workflow:**
-   - Register or log in at `/login.html` 
-   - Visit `/user.html` to see your dashboard, request credits, or navigate to `/upload.html`.
+   - Register or log in at `/login.html`.
+   - Visit `/user.html` to see your dashboard (credits, total scans, request more credits).
    - Upload a `.txt` file at `/upload.html` to scan for similar documents and download matches.
+   - View and manage your profile at `/profile.html`, including exporting scan history.
 
 3. **Admin Workflow:**
-   -   Register Log in as the admin (`admin@example.com / admin12345`) at `/login.html`.
+   - Log in as the admin (`admin@example.com / admin12345`) at `/login.html`.
    - Visit `/admin.html` to manage pending credit requests or adjust user credits.
+   - Search for users by email at `/search.html`.
+   - View analytics at `/analytics.html` for scan history and user statistics.
 
 ## File Structure
 
@@ -125,7 +173,7 @@ EchoDocs/
 │   │   ├── upload.js      # Upload/scan logic
 │   │   └── user.js        # User logic
 │   ├── admin.html         # Admin UI
-│   ├── analytics.html     # Analytics UI (basic)
+│   ├── analytics.html     # Analytics UI
 │   ├── index.html        # Homepage
 │   ├── login.html        # Login/Signup UI
 │   ├── profile.html      # Profile UI
@@ -179,15 +227,7 @@ Install with:
 ```bash
 npm install express better-sqlite3 bcrypt jsonwebtoken @google/generative-ai multer node-schedule dotenv
 ```
-
-
-## Contributing
-
-Feel free to fork the repository, submit issues, or create pull requests to enhance EchoDocs!
-
 ## License
 
 This project is unlicensed—feel free to use and modify it as needed.
-
 ---
-
